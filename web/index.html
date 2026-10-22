@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Аналитика продаж и запасов — СМГ / ЧСТ</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="drop-overlay" id="drop-overlay">
+    <div class="drop-card">
+      <div style="font-size:32px;font-weight:700;color:var(--accent);margin-bottom:8px">Перетащите файл Excel (.xlsx)</div>
+      <div style="color:var(--text-secondary)">Отчёт будет мгновенно проанализирован и загружен в программу</div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <input type="file" id="file-input" accept=".xlsx" style="display:none">
+
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="brand-box">
+        <div class="brand-logo">BA</div>
+        <div>
+          <div class="brand-title">Budget Analytics</div>
+          <div class="brand-subtitle">Анализ продаж и запасов</div>
+        </div>
+      </div>
+
+      <div class="nav-group-label">Продажи и каналы</div>
+      <ul class="nav-list" id="nav-list">
+        <li>
+          <button class="nav-btn active" data-tab="overview">
+            <span class="nav-btn-left">
+              <span>Сводка и реализация</span>
+            </span>
+            <span class="nav-badge">KPI</span>
+          </button>
+        </li>
+        <li>
+          <button class="nav-btn" data-tab="karcher">
+            <span class="nav-btn-left">
+              <span>Направление Керхер</span>
+            </span>
+            <span class="nav-badge">18 мес.</span>
+          </button>
+        </li>
+        <li>
+          <button class="nav-btn" data-tab="retail">
+            <span class="nav-btn-left">
+              <span>Розничная сеть</span>
+            </span>
+            <span class="nav-badge">4 гор.</span>
+          </button>
+        </li>
+        <li>
+          <button class="nav-btn" data-tab="intercompany">
+            <span class="nav-btn-left">
+              <span>Экспорт СМГ → ЧСТ</span>
+            </span>
+            <span class="nav-badge">B2B</span>
+          </button>
+        </li>
+      </ul>
+
+      <div class="nav-group-label">Склад, закупки и финансы</div>
+      <ul class="nav-list">
+        <li>
+          <button class="nav-btn" data-tab="warehouses">
+            <span class="nav-btn-left">
+              <span>Склады и отделы продаж</span>
+            </span>
+          </button>
+        </li>
+        <li>
+          <button class="nav-btn" data-tab="groups">
+            <span class="nav-btn-left">
+              <span>Группы и ABC-анализ</span>
+            </span>
+            <span class="nav-badge">20 гр.</span>
+          </button>
+        </li>
+        <li>
+          <button class="nav-btn" data-tab="rf">
+            <span class="nav-btn-left">
+              <span>Закупки РФ-РФ (1С SKU)</span>
+            </span>
+            <span class="nav-badge" id="badge-rf-count">1С</span>
+          </button>
+        </li>
+        <li>
+          <button class="nav-btn" data-tab="prepayments">
+            <span class="nav-btn-left">
+              <span>Предоплаты и курсы валют</span>
+            </span>
+            <span class="nav-badge">FX</span>
+          </button>
+        </li>
+      </ul>
+
+      <div class="nav-group-label">Исходные данные</div>
+      <ul class="nav-list">
+        <li>
+          <button class="nav-btn" data-tab="sheets">
+            <span class="nav-btn-left">
+              <span>Все листы Excel</span>
+            </span>
+            <span class="nav-badge" id="badge-sheets-count">16</span>
+          </button>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="file-pill">
+          <div class="file-pill-label">Активный документ</div>
+          <div class="file-pill-name" id="sidebar-filename">Загрузка...</div>
+          <div class="file-pill-meta" id="sidebar-filemeta"></div>
+        </div>
+        <div>Windows Desktop Go + HTML GUI</div>
+      </div>
+    </aside>
+
+    <div class="main-area">
+      <header class="topbar">
+        <div class="topbar-left">
+          <h1 id="page-title">Сводная аналитика продаж и товарных запасов</h1>
+          <div class="topbar-subtitle" id="page-subtitle">Первое полугодие 2024 г. · Сравнение динамики реализации, оборачиваемости и закупок</div>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-primary" id="btn-open-excel" title="Открыть другой файл Excel (.xlsx)">
+            Открыть Excel (.xlsx)
+          </button>
+          <button class="btn" id="btn-reset-excel" title="Вернуться к встроенному базовому документу">
+            Базовый отчёт
+          </button>
+          <button class="btn" id="btn-export-csv" title="Выгрузить текущий раздел в CSV для Microsoft Excel">
+            Экспорт в Excel (CSV)
+          </button>
+          <button class="btn" id="btn-print" title="Распечатать или сохранить раздел в PDF">
+            Печать / PDF
+          </button>
+          <button class="btn" id="btn-theme" title="Переключить светлую / тёмную тему">
+            Тема
+          </button>
+        </div>
+      </header>
+
+      <main class="content-body" id="app-view">
+        <div class="panel">
+          <div class="panel-body">Загрузка аналитической модели из Excel...</div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="charts.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

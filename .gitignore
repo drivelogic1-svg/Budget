@@ -1,0 +1,16 @@
+# Binaries & build outputs
+*.exe
+*.dll
+*.so
+*.dylib
+/build/
+/dist/
+/bin/
+/sales-analytics
+
+# Test & local tooling
+*.test
+*.out
+/.venv/
+__pycache__/
+~$*.xlsx

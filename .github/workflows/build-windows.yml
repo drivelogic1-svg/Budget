@@ -1,0 +1,76 @@
+name: Build Windows Desktop App
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    name: Build & Test Windows x64 (.exe)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+          cache: false
+
+      - name: Run static analysis (go vet)
+        shell: pwsh
+        run: go vet ./...
+
+      - name: Run unit & Excel analytics tests
+        shell: pwsh
+        run: go test -v ./...
+
+      - name: Build Windows Desktop GUI executable (-H=windowsgui)
+        shell: pwsh
+        env:
+          CGO_ENABLED: "0"
+          GOOS: "windows"
+          GOARCH: "amd64"
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          go build -trimpath -ldflags="-H=windowsgui -s -w" -o dist/SalesAnalytics.exe ./cmd/sales-analytics
+          go build -trimpath -ldflags="-s -w" -o dist/SalesAnalytics-Server.exe ./cmd/sales-analytics
+          Copy-Item "README.md" -Destination "dist/README.md"
+          Get-ChildItem -Filter "*.xlsx" | Copy-Item -Destination "dist/"
+          Get-ChildItem dist
+
+      - name: Smoke-test compiled Windows executable
+        shell: pwsh
+        run: |
+          $proc = Start-Process -FilePath "dist/SalesAnalytics-Server.exe" -ArgumentList "-server","-host","127.0.0.1","-port","18089" -PassThru -NoNewWindow
+          try {
+            Start-Sleep -Seconds 2
+            $health = Invoke-RestMethod -Uri "http://127.0.0.1:18089/api/health" -TimeoutSec 5
+            if (-not $health.ok) {
+              throw "Health check failed"
+            }
+            Write-Host "Smoke test OK: loaded $($health.fileName)"
+          } finally {
+            if (-not $proc.HasExited) {
+              Stop-Process -Id $proc.Id -Force
+            }
+          }
+
+      - name: Upload standalone Windows GUI .exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: SalesAnalytics-Windows-GUI-x64
+          path: dist/SalesAnalytics.exe
+          if-no-files-found: error
+
+      - name: Upload full Windows portable bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: Budget-SalesAnalytics-Portable-Bundle
+          path: dist/*
+          if-no-files-found: error
